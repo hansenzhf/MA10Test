@@ -132,7 +132,9 @@ class DealWithMA10MA60(object):
             save_buy_date(csv_path, code, name, buy_date_list)
 
         body = ""
-        res = "[10日线买入点5日内提示] " + str(set(res_name_list)) + "\n"
+        res = "[10日线买入点5日内提示] " + "\n"
+        for r in set(res_name_list):
+            res = res + r + "\n"
         print(res)
         body = body + res
         SendMail().send_mail(subject, body)
