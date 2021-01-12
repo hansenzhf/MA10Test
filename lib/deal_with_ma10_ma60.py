@@ -33,13 +33,13 @@ def read_data(file_path, dict, code):
 def save_buy_date(file_path, code, name, date_list):
     # 1. 创建文件对象
     file_name = file_path + "buy_date_record.csv"
-    f = open(file_name, "a+", newline='')
+    f = open(file_name, "a+", newline='', encoding='UTF-8')
 
     # 2. 基于文件对象构建 csv写入对象
     csv_writer = csv.writer(f)
 
     # 3. 构建列表头
-    #csv_writer.writerow(["姓名", "年龄", "性别"])
+    #csv_writer.writerow(["代码", "名称", "买入时间"])
 
     # 4. 写入csv文件内容
     csv_writer.writerow([code, name, str(date_list)])
@@ -195,7 +195,7 @@ class DealWithMA10MA60(object):
                             if count_ma10 == 20 and count_last == 20:
                                 buy_date_list.append(test_data[line_index][1])
                                 #print(test_data[line_index+20][1])
-                                if get_diff_days_to_now(test_data[line_index][1]) < 3:
+                                if get_diff_days_to_now(test_data[line_index][1]) < 7:
                                     res_name_list.append(name)
 
                 except Exception as e:
@@ -207,7 +207,7 @@ class DealWithMA10MA60(object):
             save_buy_date(csv_path, code, name, buy_date_list)
 
         body = ""
-        res = "[连续三天在10日线买入点3日内提示] " + "\n"
+        res = "[连续三天在10日线买入点7日内提示] " + "\n"
         for r in set(res_name_list):
             res = res + r + "\n"
         print(res)
