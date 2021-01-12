@@ -16,7 +16,7 @@ class TestWeekTask(unittest.TestCase):
     def test_weak_task(self):
         #GetData().get_stock_list()
         #GetData().get_data_together()
-        DealWithMA10MA60().deal_with_ma60()
+        DealWithMA10MA60().deal_with_ma10()
 
 if __name__ == "__main__":
     TestWeekTask().test_weak_task()

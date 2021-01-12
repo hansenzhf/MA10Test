@@ -132,13 +132,89 @@ class DealWithMA10MA60(object):
             save_buy_date(csv_path, code, name, buy_date_list)
 
         body = ""
-        res = "[10日线买入点5日内提示] " + "\n"
+        res = "[10日线连续在60日线上方20天买入点5日内提示] " + "\n"
         for r in set(res_name_list):
             res = res + r + "\n"
         print(res)
         body = body + res
         SendMail().send_mail(subject, body)
 
+    def deal_with_ma10(self):
+        # 清理旧记录
+        file_name = csv_path + "buy_date_record.csv"
+        os.remove(file_name)
+
+        code_list, name_list = GetData().read_index_code()
+        dict = {}
+        for i in range(0, len(code_list)):
+            dict[code_list[i]] = name_list[i]
+        #print(first_dict)
+        print(time.strftime("%Y-%m-%d", time.localtime()))
+        subject = "【买入时机测试结果】" + time.strftime("%Y-%m-%d", time.localtime())
+        body = ""
+
+        res_name_list = []
+        #dict = {"sz000009": "中国宝安"}
+        #dict = {"sz300750": "宁德时代"}
+        #print(dict)
+        for code in dict:
+            name = dict[code]
+            print("开始处理<" + name + ">")
+            buy_date_list = []
+
+            # 读取csv数据
+            try:
+                test_data = read_data(data_path, dict, code)
+            except Exception as e:
+                print("读取数据失败：<" + name + ">.csv")
+                continue
+
+            for line in test_data[-180:]:
+                #print(line)
+                try:
+                    last_price = float(line[5])
+                    ma10_price = float(line[-3])
+                    ma60_price = float(line[-2])
+                    line_index = test_data.index(line)
+
+                    # 找到连续3天在10日线上
+                    if last_price > ma10_price and test_data[line_index-1][5] > test_data[line_index-1][-3] and test_data[line_index-2][5] > test_data[line_index-2][-3] and test_data[line_index-3][5] < test_data[line_index-3][-3]:
+                        i = 0
+                        count_ma10 = 0
+                        count_last = 0
+                        #print(test_data[line_index+20][1])
+                        while i < 20:
+                            # 这个交叉处后20天,10日线始终在60日线上方，每日收盘价始终在60日上方
+                            i += 1
+                            if test_data[line_index - 20 + i][-3] > test_data[line_index - 20 + i][-2]:
+                                #print("a:" + test_data[line_index + 2 + i][-3] + "b:" + test_data[line_index + 2 + i][-2])
+                                count_ma10 += 1
+                            if test_data[line_index - 20 + i][5] > test_data[line_index - 20 + i][-2]:
+                                #print("c:" + test_data[line_index + 2 + i][-3] + "d:" + test_data[line_index + 2 + i][-2])
+                                count_last += 1
+                            if count_ma10 == 20 and count_last == 20:
+                                buy_date_list.append(test_data[line_index][1])
+                                #print(test_data[line_index+20][1])
+                                if get_diff_days_to_now(test_data[line_index][1]) < 3:
+                                    res_name_list.append(name)
+
+                except Exception as e:
+                    continue
+            res = "[" + name + "] 买：" + str(buy_date_list) + "\n"
+            print(res)
+            body = body + res
+            print("【处理完成】")
+            save_buy_date(csv_path, code, name, buy_date_list)
+
+        body = ""
+        res = "[连续三天在10日线买入点3日内提示] " + "\n"
+        for r in set(res_name_list):
+            res = res + r + "\n"
+        print(res)
+        body = body + res
+        SendMail().send_mail(subject, body)
+
+
 if __name__ == "__main__":
-    DealWithMA10MA60().deal_with_ma60()
+    DealWithMA10MA60().deal_with_ma10()
     
