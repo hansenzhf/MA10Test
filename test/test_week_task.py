@@ -14,9 +14,13 @@ from lib.deal_with_ma10_ma60 import DealWithMA10MA60
 class TestWeekTask(unittest.TestCase):
 
     def test_weak_task(self):
-        #GetData().get_stock_list()
-        #GetData().get_data_together()
-        DealWithMA10MA60().deal_with_ma10()
+        GetData().get_stock_list()
+        GetData().get_data_together()
+        #DealWithMA10MA60().deal_with_ma120()
+        DealWithMA10MA60().deal_with_ma120_ma240()
+        DealWithMA10MA60().deal_with_ma240()
+        #DealWithMA10MA60().deal_with_ma240_down()
+        DealWithMA10MA60().two_eight_turn()
 
 if __name__ == "__main__":
     TestWeekTask().test_weak_task()
